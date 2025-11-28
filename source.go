@@ -9,13 +9,18 @@ import (
 )
 
 type Source struct {
-	faker *faker.Faker
+	faker      *faker.Faker
+	loadFactor int
+	rand       *Rand
 }
 
-func NewSource() *Source {
+func NewSource(uniques int, loadFactor int) *Source {
 	faker := faker.New()
+	rand := NewRand(uint64(uniques))
 	return &Source{
-		faker: &faker,
+		faker:      &faker,
+		loadFactor: loadFactor,
+		rand:       rand,
 	}
 }
 
@@ -40,7 +45,7 @@ func (s *Source) get(id string) (*Model, error) {
 }
 
 func (s *Source) Get(ctx context.Context, id string) (*Model, error) {
-	time.Sleep(time.Microsecond * time.Duration(s.faker.IntBetween(50, 450)))
+	time.Sleep(time.Microsecond * time.Duration(s.faker.IntBetween(50, 500)))
 	return s.get(id)
 }
 
@@ -56,11 +61,11 @@ func (s *Source) BulkGet(ctx context.Context, ids []string) (map[string]*Model, 
 }
 
 func (s *Source) GenIDs() []string {
-	n := s.faker.IntBetween(20, 50)
+	n := s.faker.IntBetween(s.loadFactor, 5*s.loadFactor)
 	ids := make([]string, n)
 	for i := range n {
-		id := s.faker.IntBetween(1, 3000000)
-		ids[i] = fmt.Sprintf("%09d", id)
+		id := s.rand.Int()
+		ids[i] = fmt.Sprintf("%024d", id)
 	}
 	return ids
 }
