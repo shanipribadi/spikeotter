@@ -52,7 +52,7 @@ func (c *Cache) StatsLoop(ctx context.Context) error {
 			old = new
 			new = c.counter.Snapshot()
 			diff := new.Minus(old)
-			slog.LogAttrs(ctx, slog.LevelInfo, "ticker",
+			slog.LogAttrs(ctx, slog.LevelInfo, "cache",
 				slog.Float64("hitRatio", diff.HitRatio()),
 				slog.Uint64("loads", diff.Loads()),
 				slog.Uint64("eviction", diff.Evictions),
